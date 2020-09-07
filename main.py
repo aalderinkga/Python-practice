@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 from skimage.filters import try_all_threshold
 from skimage.filters import threshold_yen
 import os, glob
+from skimage.io import imsave
 
 
 ### Functions
@@ -19,7 +20,7 @@ def try_thresholds(image):
     fig, ax = try_all_threshold(image, figsize=(10, 8), verbose=False)
     plt.show()
 
-def yen_thresh(image):
+def yen_thresh_data(image):
     thresh = threshold_yen(image)
     binary = image > thresh
     fig, ax = plt.subplots(2, 2, figsize=(10, 10))
@@ -39,6 +40,11 @@ def yen_thresh(image):
     for a in ax[:, 0]:
         a.axis('off')
     plt.show()
+
+def yen_thresh(image):
+    thresh = threshold_yen(image)
+    binary = image > thresh
+    return(binary)
 
 def get_image_list(input_folder, string_filter='', mode_filter='include'):
 
@@ -65,31 +71,42 @@ image_folder = os.path.join(
     'PycharmProjects',
     'raw_data'
     )
+print(image_folder)
 
-### compute parent folder as absolute path
-image_folder = os.path.abspath(image_folder)
-print("Found the image folder: " + image_folder)
+names = ['C1','C2']
 
-flist_in = get_image_list(image_folder)
-flist_in.sort()
+for name in names:
 
-for i in flist_in:
-    image = mpimg.imread(i)
-    binary_image = yen_thresh(image)
+    image_folder_name = os.path.join(
+        image_folder,
+        name
+    )
+    print(image_folder_name)
 
-    ### save binary image in binary folder
-    parent, filename = os.path.split(i)
-    filename, file_extension = os.path.splitext(filename)
-    new_name = os.path.join(
-        parent,
-        'result_binary',
-        filename + '_binary' + file_extension
-        )
-    plt.imsave(filename, binary_image)
+    flist_in = get_image_list(image_folder_name,'max','include')
+    flist_in.sort()
+
+    for i in flist_in:
+        image = mpimg.imread(i)
+        binary_image = yen_thresh(image)
+
+        ### create result_binary folder
+        binary_folder = os.path.join(image_folder_name,'result_binary')
+        if not os.path.exists(binary_folder):
+            os.mkdir(binary_folder)
+
+        ### save binary image in binary folder
+        parent, filename = os.path.split(i)
+        filename, file_extension = os.path.splitext(filename)
+        new_name = os.path.join(
+            parent,
+            'result_binary',
+            filename + '_binary' + file_extension
+            )
+
+        imsave(new_name, binary_image)
 
 print("Images are done!")
 
-
-
-
-# Notes: add progress bar
+# Notes:
+# add progress bar
