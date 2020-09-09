@@ -110,3 +110,8 @@ print("Images are done!")
 
 # Notes:
 # add progress bar
+# binary images for stacks
+# remove based on biggest mask
+# make stack composite in 3d
+# plot midline
+# analyse 
